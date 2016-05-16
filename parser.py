@@ -171,6 +171,7 @@ def parser():
             for line in lines:
                 line = line.replace('\n', '')
                 line = line.replace(',', '.')
+                line = line.replace("'", "")
 
                 values = line.split(';')
                 i = 0
@@ -215,7 +216,7 @@ def parser():
                         value = definitiv(val)
                         value4 =val.get('Retouren definitiv exkl. MwSt (CHF)')
                         try:
-                            value = value4 * float(value) / 100.0
+                            value = float(value4) * float(value) / 100
                         except:
                             value = 0
                         new_line = '%s%s;' % (new_line, value)
@@ -224,7 +225,7 @@ def parser():
                         value = definitiv(val)
                         value4 =val.get('Retouren definitiv exkl. MwSt (CHF)')
                         try:
-                            value = value4 - value4 * float(value) / 100.0
+                            value = float(value4) - float(value4) * float(value) / 100
                         except:
                             value = 0
                         new_line = '%s%s;' % (new_line, value)
@@ -234,15 +235,16 @@ def parser():
 
                         value4 =val.get('Waren und Dienstleistungen inkl. MwSt. (CHF)')
                         try:
-                            value = value4 - value4 * float(value) / 100.0
+                            value = float(value4) - float(value4) * float(value) / 100
                         except:
                             value = 0
                         new_line = '%s%s;' % (new_line, value)
 
                     elif key == 'Waren und Dienstleistungen MwSt':
+                        value = waren(val)
                         value4 =val.get('Waren und Dienstleistungen inkl. MwSt. (CHF)')
                         try:
-                            value = value4 * float(value) / 100.0
+                            value = float(value4) * float(value) / 100
                         except:
                             value = 0
                         new_line = '%s%s;' % (new_line, value)

@@ -69,6 +69,75 @@ def move_key(line_keys):
                 new_line_keys.append(line_key)
     return new_line_keys
 
+def definitiv(val):
+    try:
+        value1 = float(val.get('Retouren definitiv MwSt 2,5% (CHF)'))
+    except:
+        value1 = 0
+    try:
+        value2 = val.get('Retouren definitiv MwSt 8% (CHF)')
+    except:
+        value2 = 0
+    try:
+        value3 = val.get('Retouren definitiv MwSt 0% (CHF)')
+    except:
+        value3 = 0
+    if value1 and value2 and value3 or value1 and value2 or value1 and value3 or value2 and value3:
+        value = 0
+    elif value2 != 0:
+        value = 8
+    elif value1 != 0:
+        value = 2.5
+    elif value1 != 0:
+        value = 0
+    else:
+        value = 0
+    return value
+
+def waren(val):
+    try:
+        value1 = float(val.get('Waren und Dienstleistungen MwSt 2,5% (CHF)'))
+    except:
+        value1 = 0
+    try:
+        value2 = val.get('Waren und Dienstleistungen MwSt 8% (CHF)')
+    except:
+        value2 = 0
+    try:
+        value3 = val.get('Waren und Dienstleistungen MwSt 0% (CHF)')
+    except:
+        value3 = 0
+    if value1 and value2 and value3 or value1 and value2 or value1 and value3 or value2 and value3:
+        value = 0
+    elif value2 != 0:
+        value = 8
+    elif value1 != 0:
+        value = 2.5
+    elif value1 != 0:
+        value = 0
+    else:
+        value = 0
+    return value
+
+def mwst(val):
+    try:
+        value1 = float(val.get('Artikelpreis MwSt 2,5% (CHF)'))
+    except:
+        value1 = 0
+    try:
+        value2 = val.get('Artikelpreis MwSt 8% (CHF)')
+    except:
+        value2 = 0
+
+    if value1 and value2:
+        value = 0
+    elif value2 != 0:
+        value = 8
+    elif value1 != 0:
+        value = 2.5
+    else:
+        value = 0
+    return value
 
 def parser():
     file_list = files_list()
@@ -99,7 +168,6 @@ def parser():
             first_line += '\n'
             new_file.write(first_line)
 
-            vals = []
             for line in lines:
                 line = line.replace('\n', '')
                 line = line.replace(',', '.')
@@ -140,73 +208,69 @@ def parser():
                     elif key == 'RetoureNr':
                         new_line = '%s%s;' % (new_line, val.get('Händlerkommissionsbetrag excl. MwSt.'))
 
-                    elif key == 'Retouren definitiv netto':
-                        new_line = '%s%s;' % (new_line, val.get('Retouren definitiv exkl. MwSt (CHF)'))
-                    elif key == 'Retouren definitiv MwSt':
-                        new_line = '%s%s;' % (new_line, val.get('Retouren definitiv MwSt 8% (CHF)'))
-
                     elif key == 'Retouren definitiv brutto':
-                        new_line = '%s%s;' % (new_line, val.get('Retouren definitiv MwSt 0% (CHF)'))
+                        new_line = '%s%s;' % (new_line, val.get('Retouren definitiv exkl. MwSt (CHF)'))
+
+                    elif key == 'Retouren definitiv MwSt':
+                        value = definitiv(val)
+                        value4 =val.get('Retouren definitiv exkl. MwSt (CHF)')
+                        try:
+                            value = value4 * float(value) / 100.0
+                        except:
+                            value = 0
+                        new_line = '%s%s;' % (new_line, value)
+
+                    elif key == 'Retouren definitiv netto':
+                        value = definitiv(val)
+                        value4 =val.get('Retouren definitiv exkl. MwSt (CHF)')
+                        try:
+                            value = value4 - value4 * float(value) / 100.0
+                        except:
+                            value = 0
+                        new_line = '%s%s;' % (new_line, value)
 
                     elif key == 'Waren und Dienstleistungen netto':
-                        new_line = '%s%s;' % (new_line, val.get('Retouren definitiv inkl. MwSt (CHF)'))
+                        value = waren(val)
+
+                        value4 =val.get('Waren und Dienstleistungen inkl. MwSt. (CHF)')
+                        try:
+                            value = value4 - value4 * float(value) / 100.0
+                        except:
+                            value = 0
+                        new_line = '%s%s;' % (new_line, value)
+
                     elif key == 'Waren und Dienstleistungen MwSt':
-                        new_line = '%s%s;' % (new_line, val.get('Waren und Dienstleistungen exkl. MwSt (CHF)'))
+                        value4 =val.get('Waren und Dienstleistungen inkl. MwSt. (CHF)')
+                        try:
+                            value = value4 * float(value) / 100.0
+                        except:
+                            value = 0
+                        new_line = '%s%s;' % (new_line, value)
+
                     elif key == 'Waren und Dienstleistungen brutto':
-                        new_line = '%s%s;' % (new_line, val.get('Waren und Dienstleistungen MwSt 0% (CHF)'))
+                        new_line = '%s%s;' % (new_line, val.get('Waren und Dienstleistungen inkl. MwSt. (CHF)'))
 
                     elif key == 'Versandart / Capping':
                         new_line = '%s%s;' % (new_line, val.get('Versandart'))
 
                     elif key == 'MwSt-Satz':
-                        try:
-                            value1 = float(val.get('Artikelpreis MwSt 2,5% (CHF)'))
-                        except:
-                            value1 = 0
-                        try:
-                            value2 = val.get('Artikelpreis MwSt 8% (CHF)')
-                        except:
-                            value2 = 0
-
-                        if value1 and value2:
-                            value = 0
-                        elif value2 != 0:
-                            value = 8
-                        elif value1 != 0:
-                            value = 2.5
-                        else:
-                            value = 0
+                        value = mwst(val)
                         new_line = '%s%s;' % (new_line, value)
 
                     elif key == 'Artikelpreis MwSt':
-                        try:
-                            value1 = float(val.get('Artikelpreis MwSt 2,5% (CHF)'))
-                        except:
-                            value1 = 0
-                        try:
-                            value2 = float(val.get('Artikelpreis MwSt 8% (CHF)'))
-                        except:
-                            value2 = 0
-
-                        if value1 and value2:
-                            value = 0
-                        elif value2 != 0:
-                            value = 8
-                        elif value1 != 0:
-                            value = 2.5
-                        else:
-                            value = 0
-
+                        value = mwst(val)
                         value3 = val.get('Artikelpreis netto (CHF)')
                         try:
                             value = int(value3) * value / 100.0
                         except:
                             value = 0
                         new_line = '%s%s;' % (new_line, value)
+
                     elif key == 'Händlerkommissionsbetrag netto':
                         value = val.get('Waren und Dienstleistungen inkl. MwSt. (CHF)')
                         new_line = '%s%s;' % (new_line, value)
                     else:
+
                         new_line = '%s%s;' % (new_line, val.get(key))
 
                 new_line += '\n'

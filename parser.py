@@ -125,7 +125,7 @@ def mwst(val):
     except:
         value1 = 0
     try:
-        value2 = val.get('Artikelpreis MwSt 8% (CHF)')
+        value2 = float(val.get('Artikelpreis MwSt 8% (CHF)'))
     except:
         value2 = 0
 
@@ -166,6 +166,7 @@ def parser():
             for key in new_line_keys:
                 first_line += '%s;' % str(key)
             first_line += '\n'
+            first_line = first_line.replace('\r', '')
             new_file.write(first_line)
 
             for line in lines:
@@ -177,8 +178,11 @@ def parser():
                 i = 0
                 val = {}
                 for value in values:
-                    val[line_keys[i]] = value
-                    i += 1
+                    try:
+                        val[line_keys[i]] = value
+                        i += 1
+                    except:
+                        pass
 
                 new_line = ''
                 i = 1
@@ -275,8 +279,10 @@ def parser():
 
                         new_line = '%s%s;' % (new_line, val.get(key))
 
-                new_line += '\n'
-                new_file.write(new_line)
+                if new_line:
+                    new_line = new_line.replace('\r', '')
+                    new_line += '\n'
+                    new_file.write(new_line)
             new_file.close()
 
 

@@ -146,8 +146,10 @@ def mwst(val):
 
 def parser():
     file_list = files_list()
+    import codecs
     for f in file_list:
-        open_file = open(f)
+
+        open_file = codecs.open(f, 'r', encoding='utf-8', errors='ignore')
         lines = open_file.readlines()
         if 'Art;' in lines[0]:
             name = f.split('.')
